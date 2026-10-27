@@ -79,3 +79,28 @@ axes[1].tick_params(axis="x", rotation=15)
 
 plt.tight_layout()
 plt.show()
+
+import matplotlib.pyplot as plt
+
+# Predict grades using the trained Random Forest
+predictions = rf_model.predict(X_test)
+
+# Plot actual vs predicted grades
+plt.figure(figsize=(7, 6))
+plt.scatter(y_test, predictions, alpha=0.7)
+
+# Perfect prediction reference line
+minimum = min(y_test.min(), predictions.min())
+maximum = max(y_test.max(), predictions.max())
+
+plt.plot(
+    [minimum, maximum],
+    [minimum, maximum],
+    linestyle="--"
+)
+
+plt.xlabel("Actual Final Grade")
+plt.ylabel("Predicted Final Grade")
+plt.title("Actual vs Predicted Student Grades")
+plt.tight_layout()
+plt.show()
