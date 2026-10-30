@@ -1,34 +1,24 @@
-
 from ucimlrepo import fetch_ucirepo
 import pandas as pd
 import matplotlib.pyplot as plt
-
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
 
-# 1. Load the dataset
 dataset = fetch_ucirepo(id=320)
 
 X = dataset.data.features.copy()
 y = dataset.data.targets["G3"]
 
-# 2. Remove previous grades to avoid using them as features
 X = X.drop(columns=["G1", "G2"], errors="ignore")
-
-# 3. Convert categorical features into numerical features
 X = pd.get_dummies(X, drop_first=True)
-
-# 4. Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
     test_size=0.2,
     random_state=42
 )
-
-# 5. Create both models
 models = {
     "Decision Tree": DecisionTreeRegressor(
         max_depth=4,
@@ -40,12 +30,8 @@ models = {
         random_state=42
     )
 }
-
-# Store results for comparison
 results = []
 rf_predictions = None
-
-# 6. Train and evaluate both models
 for name, model in models.items():
     model.fit(X_train, y_train)
 
@@ -71,7 +57,6 @@ for name, model in models.items():
         "Testing R2": test_r2
     })
 
-    # Save actual Random Forest predictions for the graph
     if name == "Random Forest":
         rf_predictions = test_predictions
 
@@ -81,14 +66,12 @@ for name, model in models.items():
     print(f"Testing MAE:  {test_mae:.2f}")
     print(f"Testing R²:   {test_r2:.3f}")
 
-# 7. Create a comparison table
 results_df = pd.DataFrame(results)
 
 print("\nModel Comparison")
 print("================")
 print(results_df.round(3).to_string(index=False))
 
-# 8. Plot model comparison
 model_names = results_df["Model"].tolist()
 test_mae_values = results_df["Testing MAE"].tolist()
 test_r2_values = results_df["Testing R2"].tolist()
@@ -108,7 +91,6 @@ axes[1].tick_params(axis="x", rotation=15)
 
 plt.tight_layout()
 
-# Save the comparison graph
 plt.savefig(
     "model_comparison.png",
     dpi=300,
@@ -116,17 +98,12 @@ plt.savefig(
 )
 
 plt.show()
-
-# 9. Plot actual vs predicted grades for Random Forest
 plt.figure(figsize=(7, 6))
-
 plt.scatter(
     y_test,
     rf_predictions,
     alpha=0.7
 )
-
-# Reference line for perfect predictions
 minimum = min(y_test.min(), rf_predictions.min())
 maximum = max(y_test.max(), rf_predictions.max())
 
@@ -136,14 +113,12 @@ plt.plot(
     linestyle="--",
     label="Perfect Prediction"
 )
-
 plt.xlabel("Actual Final Grade")
 plt.ylabel("Predicted Final Grade")
 plt.title("Actual vs Predicted Student Grades")
 plt.legend()
 plt.tight_layout()
 
-# Save the prediction graph
 plt.savefig(
     "student_predictions.png",
     dpi=300,
@@ -151,7 +126,6 @@ plt.savefig(
 )
 
 plt.show()
-
 print("\nGraphs saved successfully:")
 print("1. model_comparison.png")
 print("2. student_predictions.png")
